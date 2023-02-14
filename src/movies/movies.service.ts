@@ -1,6 +1,8 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import FormData from 'form-data';
+
+import { IPagination, IPositiveRequest } from '../../core/types/main';
 import { findUrlUtil } from '../../core/utils/find-url.util';
 
 import { MaxMinYearResDTO } from './dto/max-min-year.response.dto';
@@ -57,5 +59,27 @@ export default class MoviesService {
 
   async getMaxMinYear(): Promise<MaxMinYearResDTO> {
     return this.moviesRepository.getMaxMinYear();
+  }
+
+  async fetchMovies(): Promise<IPositiveRequest> {
+    let page = 1;
+
+    const sort_by = 'primary_release_date.asc';
+    const primary_release_date = new Date().toJSON().slice(0, 10);
+
+    setInterval(async () => {
+      const { data } = await this.httpService.axiosRef.get<IPagination>(
+        `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.API_KEY}&sort_by=${sort_by}&include_adult=true&page=${page}&language=ru&primary_release_date.gte=${primary_release_date}`,
+      );
+      if (data) {
+        throw new BadRequestException('Not found');
+      }
+
+      this.moviesRepository.saveMovies(data.results);
+
+      page++;
+    }, 3000);
+
+    return { success: true };
   }
 }

@@ -156,4 +156,13 @@ export class MoviesRepository {
       min_year: query.minYear.getFullYear(),
     };
   }
+
+  async saveMovies(movies: MovieEntity[]): Promise<void> {
+    try {
+      const moviesEntities = this.movieEntity.create(movies);
+      await this.movieEntity.save(moviesEntities);
+    } catch {
+      throw new BadRequestException('Bad request');
+    }
+  }
 }

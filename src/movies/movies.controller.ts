@@ -1,6 +1,8 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { IPositiveRequest } from '../../core/types/main';
+
 import { GetLastPopularDto } from './dto/get-last-popular.dto';
 import { GetMovieByIdDto } from './dto/get-movie-by-id.dto';
 import { PaginateMoviesDto } from './dto/paginate-movie.dto';
@@ -51,5 +53,10 @@ export class MoviesController {
     @Param() getMovieByIdDto: GetMovieByIdDto,
   ): Promise<IFindMovieById> {
     return this.moviesService.findMovieById(getMovieByIdDto.movieId);
+  }
+
+  // @Cron(CronExpression.EVERY_DAY_AT_10AM)
+  fetch(): Promise<IPositiveRequest> {
+    return this.moviesService.fetchMovies();
   }
 }

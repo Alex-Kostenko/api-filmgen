@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { configService } from './config/config.service';
@@ -12,6 +13,7 @@ import { MoviesModule } from './movies/movies.module';
     FiltersModule,
     MoviesModule,
     GenresModule,
+    ScheduleModule.forRoot(),
   ],
 })
 export class AppModule {}
