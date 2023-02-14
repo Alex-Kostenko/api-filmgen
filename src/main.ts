@@ -6,7 +6,14 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    cors: { allowedHeaders: ['content-type'] },
+    cors: {
+      origin: '*',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+      preflightContinue: false,
+      optionsSuccessStatus: 204,
+      allowedHeaders: ['content-type'],
+      credentials: true,
+    },
   });
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
