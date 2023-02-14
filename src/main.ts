@@ -11,7 +11,7 @@ async function bootstrap() {
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
       preflightContinue: false,
       optionsSuccessStatus: 204,
-      allowedHeaders: ['content-type'],
+      allowedHeaders: ['content-type', 'application/json'],
       credentials: true,
     },
   });
