@@ -5,13 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
-  app.enableCors({
-    credentials: true,
-    origin: [/localhost:\d+$/, /\.vercel\.app$/, /\.herokuapp\.com$/],
-    allowedHeaders: 'origin, content-type, accept',
-  });
+  const app = await NestFactory.create(AppModule, { cors: true });
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.use('/favicon-*', (_, res) => res.send());
