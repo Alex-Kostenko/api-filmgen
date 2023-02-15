@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 
-import { Filters, SortDirection } from '../../core/enums/main';
+import { Filters, Ordering, SortDirection } from '../../core/enums/main';
 
 import { FilterMoviesDto } from './dto/filter-movie.dto';
 import { MaxMinYearResDTO } from './dto/max-min-year.response.dto';
@@ -31,7 +31,7 @@ export class MoviesRepository {
     const query = this.movieEntity.createQueryBuilder('movies');
 
     query.orderBy(
-      `movies.${orderBy}`,
+      `movies.${orderBy ? orderBy : Ordering.Popularity}`,
       dir === SortDirection.Descend ? 'DESC' : 'ASC',
     );
 
