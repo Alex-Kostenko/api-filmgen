@@ -6,11 +6,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({
-    origin: [/localhost:\d+$/, /\.vercel\.app$/, /\.herokuapp\.com$/],
-    allowedHeaders: ['content-type', 'accept', 'origin', 'application/json'],
-    credentials: true,
-  });
+  app.enableCors();
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.use('/favicon-*', (_, res) => res.send());
