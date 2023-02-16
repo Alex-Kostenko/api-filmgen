@@ -56,7 +56,7 @@ export class MoviesController {
   }
 
   // @Cron(CronExpression.EVERY_DAY_AT_10AM)
-  fetch(): Promise<IPositiveRequest> {
+  fetchMovie(): Promise<IPositiveRequest> {
     return this.moviesService.fetchMovies();
   }
 }
