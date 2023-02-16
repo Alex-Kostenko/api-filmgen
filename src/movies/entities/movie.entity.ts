@@ -25,6 +25,10 @@ export class MovieEntity {
 
   @ApiProperty({ type: String })
   @Column({ type: 'varchar' })
+  original_title: string;
+
+  @ApiProperty({ type: String })
+  @Column({ type: 'varchar', nullable: false, default: '' })
   overview: string;
 
   @ApiProperty({ type: Number })

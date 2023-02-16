@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { IPositiveRequest } from '../../core/types/main';
@@ -53,6 +61,16 @@ export class MoviesController {
     @Param() getMovieByIdDto: GetMovieByIdDto,
   ): Promise<IFindMovieById> {
     return this.moviesService.findMovieById(getMovieByIdDto.movieId);
+  }
+
+  @Delete('delete-by-year/:year')
+  async remove(@Param('year') year: number): Promise<IPositiveRequest> {
+    return this.moviesService.remove(year);
+  }
+
+  @Get('copy')
+  async copyFilms(): Promise<IPositiveRequest> {
+    return this.moviesService.copyMovies();
   }
 
   // @Cron(CronExpression.EVERY_DAY_AT_10AM)

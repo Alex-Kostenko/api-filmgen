@@ -1,12 +1,20 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  Brackets,
+  LessThanOrEqual,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
 
 import { Filters, Ordering, SortDirection } from '../../core/enums/main';
+import { IPositiveRequest } from '../../core/types/main';
 
 import { FilterMoviesDto } from './dto/filter-movie.dto';
 import { MaxMinYearResDTO } from './dto/max-min-year.response.dto';
@@ -154,6 +162,23 @@ export class MoviesRepository {
     return {
       max_year: query.maxYear.getFullYear(),
       min_year: query.minYear.getFullYear(),
+    };
+  }
+
+  async remove(year: number): Promise<IPositiveRequest> {
+    const deletedMovies = await this.movieEntity
+      .createQueryBuilder('movies')
+      .delete()
+      .from('movies')
+      .where({ release_date: LessThanOrEqual('2021-10-08') })
+      .execute();
+
+    if (deletedMovies.affected === 0) {
+      throw new HttpException('Movies is not exist', HttpStatus.NOT_FOUND);
+    }
+
+    return {
+      success: true,
     };
   }
 
