@@ -7,16 +7,6 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
-  // app.enableCors({
-  //   origin: ['http://localhost:3000', 'https://api-filmgen-pearl.vercel.app'],
-  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  //   preflightContinue: false,
-  //   optionsSuccessStatus: 204,
-  //   credentials: true,
-  //   allowedHeaders:
-  //     'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Observe',
-  // });
-
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.use('/favicon-*', (_, res) => res.send());
 
