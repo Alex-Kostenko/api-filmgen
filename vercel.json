@@ -9,7 +9,8 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "src/main.ts"
+      "dest": "src/main.ts",
+      "methods": ["POST", "GET", "PUT", "DELETE"]
     }
   ],
   "headers": [
@@ -34,14 +35,5 @@
         }
       ]
     }
-  ],
-  "env": {
-    "API_KEY": "bda1be4015084d91d175624c232ad81c",
-    "DATABASE_PASSWORD": "Ihy5j2kFdEZkUeAOPQYtUDfYL7iQFxin",
-    "DATABASE_URL": "postgres://zxoxkzip:Ihy5j2kFdEZkUeAOPQYtUDfYL7iQFxin@salt.db.elephantsql.com/zxoxkzip",
-    "DATABASE_URL_PROD": "https://api-filmgen-pearl.vercel.app",
-    "REZKA_URL": "http://hdrezkaj1p9yu.org/engine/ajax/search.php",
-    "SWAGGER_CSS": "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css",
-    "MICROSOFT_URL": "https://www.microsoft.com/msstoreapiprod/api/autosuggest?market=&clientId=7F27B536-CF6B-4C65-8638-A0F8CBDFCA65sources=Iris-Products%2CDCatAll-Products%2CMicrosoft-Terms&filter=%2BClientType%3AStoreWeb&counts=1%2C5%2C5"
-  }
+  ]
 }
