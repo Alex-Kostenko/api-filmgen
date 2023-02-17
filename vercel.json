@@ -9,6 +9,11 @@
   "routes": [
     {
       "src": "/(.*)",
+      "status": 308,
+      "headers": { "Location": "https://api-filmgen-pearl.vercel.app" }
+    },
+    {
+      "src": "/(.*)",
       "dest": "src/main.ts",
       "methods": ["POST", "GET", "PUT", "DELETE"]
     }
