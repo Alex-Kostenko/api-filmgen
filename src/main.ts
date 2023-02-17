@@ -7,11 +7,13 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  /* app.enableCors({
-    origin: ['http://localhost:3000', 'https://api-filmgen-pearl.vercel.app'],
+  app.enableCors({
+    origin: '*',
     methods: ['GET', 'POST'],
     credentials: true,
-  });*/
+    allowedHeaders:
+      'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Observe',
+  });
 
   // let whitelist = [
   //   'http://localhost:3000',

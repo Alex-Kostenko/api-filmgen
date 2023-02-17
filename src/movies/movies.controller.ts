@@ -37,11 +37,12 @@ export class MoviesController {
   async findAllPaginate(
     @Query() paginateMoviesDto: PaginateMoviesDto,
     @Body() paginationBodyDTO: PaginationBodyDTO,
-  ): Promise<PaginationResDTO> {
-    return this.moviesService.findAllPaginate(
-      paginateMoviesDto,
-      paginationBodyDTO,
-    );
+  ) {
+    // return this.moviesService.findAllPaginate(
+    //   paginateMoviesDto,
+    //   paginationBodyDTO,
+    // );
+    return [];
   }
 
   @ApiOperation({ summary: 'Get movie by ID' })
