@@ -3,10 +3,6 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('movies')
 export class MovieEntity {
-  @ApiProperty({ type: Number, default: 34234 })
-  @PrimaryColumn()
-  id: number;
-
   @ApiProperty({ type: Boolean })
   @Column({ type: 'boolean', nullable: false, default: false })
   adult: boolean;
@@ -19,12 +15,20 @@ export class MovieEntity {
   @Column('int', { array: true })
   genre_ids: number[];
 
+  @ApiProperty({ type: Number, default: 34234 })
+  @PrimaryColumn()
+  id: number;
+
   @ApiProperty({ type: String })
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   original_language: string;
 
   @ApiProperty({ type: String })
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
+  original_title: string;
+
+  @ApiProperty({ type: String })
+  @Column({ type: 'varchar', nullable: false, default: '' })
   overview: string;
 
   @ApiProperty({ type: Number })
@@ -36,11 +40,11 @@ export class MovieEntity {
   poster_path: string;
 
   @ApiProperty({ type: Date, example: '2021-20-20' })
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   release_date: Date;
 
   @ApiProperty({ type: String })
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   title: string;
 
   @ApiProperty({ type: Boolean })
