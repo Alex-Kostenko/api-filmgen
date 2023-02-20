@@ -26,7 +26,7 @@ export default class MoviesService {
   ): Promise<PaginationResDTO> {
     const result = await this.moviesRepository.findAllPaginate(
       paginateMoviesDto,
-      paginationBodyDTO.filters,
+      paginationBodyDTO,
     );
 
     return {

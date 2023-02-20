@@ -11,6 +11,7 @@ import { Filters, Ordering, SortDirection } from '../../core/enums/main';
 import { FilterMoviesDto } from './dto/filter-movie.dto';
 import { MaxMinYearResDTO } from './dto/max-min-year.response.dto';
 import { PaginateMoviesDto } from './dto/paginate-movie.dto';
+import { PaginationBodyDTO } from './dto/pagination-body.dto';
 import { MovieEntity } from './entities/movie.entity';
 import { IMoviesPagination } from './types/main';
 
@@ -23,32 +24,50 @@ export class MoviesRepository {
 
   async findAllPaginate(
     paginateMoviesDto: PaginateMoviesDto,
-    paginationBodyDTO: FilterMoviesDto[],
+    paginationBodyDTO: PaginationBodyDTO,
   ): Promise<IMoviesPagination> {
-    const { pageSize, page, searchTerm, orderBy, dir } = paginateMoviesDto;
+    const { pageSize, page, searchTerm } = paginateMoviesDto;
+    const { filters, orderBy, dir, includeAdult, searchInDescription } =
+      paginationBodyDTO;
     const currentTime = new Date();
     const currentYear = currentTime.getFullYear();
     const query = this.movieEntity.createQueryBuilder('movies');
 
+    if (!includeAdult) {
+      query.where('movies.adult = :adult', { adult: false });
+    }
+
     query.orderBy(
       `movies.${orderBy ? orderBy : Ordering.Popularity}`,
-      dir === SortDirection.Descend ? 'DESC' : 'ASC',
+      dir === SortDirection.Ascend ? 'ASC' : 'DESC',
     );
 
     query.take(pageSize).skip((page - 1) * pageSize);
 
     if (!query) throw new BadRequestException('No such page');
 
-    if (paginationBodyDTO.length) {
-      for await (const filter of paginationBodyDTO) {
+    if (filters.length) {
+      for await (const filter of filters) {
         this.filterMovies(query, filter, currentYear);
       }
     }
 
     if (searchTerm) {
-      query.where('movies.title ILIKE :title', {
-        title: `%${searchTerm.trim()}%`,
-      });
+      const trimmedSearch = searchTerm.trim();
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('movies.title ILIKE :title', {
+            title: `%${trimmedSearch}%`,
+          }).orWhere('movies.original_title ILIKE :original_title', {
+            original_title: `%${trimmedSearch}%`,
+          });
+
+          searchInDescription &&
+            qb.orWhere('movies.overview ILIKE :overview', {
+              overview: `%${trimmedSearch}%`,
+            });
+        }),
+      );
     }
 
     const totalAmount = await query.getCount();
