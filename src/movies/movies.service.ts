@@ -4,6 +4,7 @@ import FormData from 'form-data';
 
 import { IPagination, IPositiveRequest } from '../../core/types/main';
 import { findUrlUtil } from '../../core/utils/find-url.util';
+import { parseUrlUtil } from '../../core/utils/parse-url.util';
 
 import { MaxMinYearResDTO } from './dto/max-min-year.response.dto';
 import { PaginateMoviesDto } from './dto/paginate-movie.dto';
@@ -37,19 +38,49 @@ export default class MoviesService {
 
   async findMovieById(movieId: number): Promise<IFindMovieById> {
     const movie = await this.moviesRepository.findMovieById(movieId);
+    const { original_title, title } = movie;
+
+    return {
+      ...movie,
+      urls: [
+        { link: await this.findRezkaUrl(title), site: 'rezka' },
+        {
+          link: original_title && (await this.findMicrosoftUrl(original_title)),
+          site: 'microsoft',
+        },
+      ],
+    };
+  }
+
+  async findMicrosoftUrl(title: string): Promise<string> {
+    try {
+      const microsoftData = await this.httpService.axiosRef.get(
+        process.env.MICROSOFT_URL + parseUrlUtil(title),
+      );
+
+      const microsoftUrl = microsoftData?.data?.ResultSets[0]?.Suggests?.find(
+        ({ Source }) => Source === 'Movie',
+      );
+      return microsoftUrl.Url.replace('//', '');
+    } catch {
+      return null;
+    }
+  }
+
+  async findRezkaUrl(title: string): Promise<string> {
     try {
       const bodyData = new FormData();
-      bodyData.append('q', movie.title);
-      const { data } = await this.httpService.axiosRef.post(
+      bodyData.append('q', title);
+      const rezkaData = await this.httpService.axiosRef.post(
         process.env.REZKA_URL,
         bodyData,
       );
 
-      const url = findUrlUtil(data);
+      const rezkaUrl = findUrlUtil(rezkaData.data);
 
-      return { ...movie, urls: [{ rezkaUrl: url }] };
+      return rezkaUrl;
     } catch {
-      return { ...movie, urls: [] };
+      return null;
     }
   }
 
