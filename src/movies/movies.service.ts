@@ -53,19 +53,6 @@ export default class MoviesService {
     };
   }
 
-  async findExFsUrl(movieId: number): Promise<IMoviesUrls> {
-    const movie = await this.moviesRepository.findMovieById(movieId);
-
-    return {
-      link: await this.findUrlWithFormData(
-        'query',
-        movie.title,
-        process.env.EXFS_URL,
-      ),
-      site: 'ex-fs',
-    };
-  }
-
   async findMicrosoftUrl(movieId: number): Promise<IMoviesUrls> {
     const movie = await this.moviesRepository.findMovieById(movieId);
     try {

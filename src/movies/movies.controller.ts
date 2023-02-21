@@ -67,17 +67,6 @@ export class MoviesController {
     return this.moviesService.findRezkaUrl(getMovieByIdDto.movieId);
   }
 
-  @ApiOperation({ summary: 'Get ex-fs url' })
-  @ApiOkResponse({
-    type: FindMovieUrlDto,
-  })
-  @Get('find-exfs-url/:movieId')
-  async findExFsUrl(
-    @Param() getMovieByIdDto: GetMovieByIdDto,
-  ): Promise<IMoviesUrls> {
-    return this.moviesService.findExFsUrl(getMovieByIdDto.movieId);
-  }
-
   @ApiOperation({ summary: 'Get microsoft url' })
   @ApiOkResponse({
     type: FindMovieUrlDto,
