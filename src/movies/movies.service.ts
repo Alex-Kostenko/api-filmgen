@@ -52,14 +52,6 @@ export default class MoviesService {
           site: 'rezka',
         },
         {
-          link: await this.findUrlWithFormData(
-            'query',
-            title,
-            process.env.EXFS_URL,
-          ),
-          site: 'ex-fs',
-        },
-        {
           link: original_title && (await this.findMicrosoftUrl(original_title)),
           site: 'microsoft',
         },
