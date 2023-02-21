@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { IPositiveRequest } from '../../core/types/main';
+import { FindMovieUrlDto } from './dto/find-movie-url.dto';
 
 import { GetLastPopularDto } from './dto/get-last-popular.dto';
 import { GetMovieByIdDto } from './dto/get-movie-by-id.dto';
@@ -10,7 +11,7 @@ import { PaginationBodyDTO } from './dto/pagination-body.dto';
 import { PaginationResDTO } from './dto/pagination.result.dto';
 import { MovieEntity } from './entities/movie.entity';
 import MoviesService from './movies.service';
-import { IFindMovieById } from './types/main';
+import { IMoviesUrls } from './types/main';
 
 @ApiTags('Movies')
 @Controller('movies')
@@ -51,8 +52,41 @@ export class MoviesController {
   @Get('get-by-id/:movieId')
   async findMovieById(
     @Param() getMovieByIdDto: GetMovieByIdDto,
-  ): Promise<IFindMovieById> {
+  ): Promise<MovieEntity> {
     return this.moviesService.findMovieById(getMovieByIdDto.movieId);
+  }
+
+  @ApiOperation({ summary: 'Get rezka url' })
+  @ApiOkResponse({
+    type: FindMovieUrlDto,
+  })
+  @Get('find-rezka-url/:movieId')
+  async findRezkaUrl(
+    @Param() getMovieByIdDto: GetMovieByIdDto,
+  ): Promise<IMoviesUrls> {
+    return this.moviesService.findRezkaUrl(getMovieByIdDto.movieId);
+  }
+
+  @ApiOperation({ summary: 'Get ex-fs url' })
+  @ApiOkResponse({
+    type: FindMovieUrlDto,
+  })
+  @Get('find-exfs-url/:movieId')
+  async findExFsUrl(
+    @Param() getMovieByIdDto: GetMovieByIdDto,
+  ): Promise<IMoviesUrls> {
+    return this.moviesService.findExFsUrl(getMovieByIdDto.movieId);
+  }
+
+  @ApiOperation({ summary: 'Get microsoft url' })
+  @ApiOkResponse({
+    type: FindMovieUrlDto,
+  })
+  @Get('find-microsoft-url/:movieId')
+  async findMicrosoftUrl(
+    @Param() getMovieByIdDto: GetMovieByIdDto,
+  ): Promise<IMoviesUrls> {
+    return this.moviesService.findMicrosoftUrl(getMovieByIdDto.movieId);
   }
 
   // @Cron(CronExpression.EVERY_DAY_AT_10AM)

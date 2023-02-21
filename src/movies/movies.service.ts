@@ -12,7 +12,7 @@ import { PaginationBodyDTO } from './dto/pagination-body.dto';
 import { PaginationResDTO } from './dto/pagination.result.dto';
 import { MovieEntity } from './entities/movie.entity';
 import { MoviesRepository } from './movies.repository';
-import { IFindMovieById } from './types/main';
+import { IMoviesUrls } from './types/main';
 
 @Injectable()
 export default class MoviesService {
@@ -36,49 +36,56 @@ export default class MoviesService {
     };
   }
 
-  async findMovieById(movieId: number): Promise<IFindMovieById> {
+  async findMovieById(movieId: number): Promise<MovieEntity> {
+    return this.moviesRepository.findMovieById(movieId);
+  }
+
+  async findRezkaUrl(movieId: number): Promise<IMoviesUrls> {
     const movie = await this.moviesRepository.findMovieById(movieId);
-    const { original_title, title } = movie;
 
     return {
-      ...movie,
-      urls: [
-        {
-          link: await this.findUrlWithFormData(
-            'q',
-            title,
-            process.env.REZKA_URL,
-          ),
-          site: 'rezka',
-        },
-        {
-          link: await this.findUrlWithFormData(
-            'query',
-            title,
-            process.env.EXFS_URL,
-          ),
-          site: 'ex-fs',
-        },
-        {
-          link: original_title && (await this.findMicrosoftUrl(original_title)),
-          site: 'microsoft',
-        },
-      ],
+      link: await this.findUrlWithFormData(
+        'q',
+        movie.title,
+        process.env.REZKA_URL,
+      ),
+      site: 'rezka',
     };
   }
 
-  async findMicrosoftUrl(title: string): Promise<string> {
+  async findExFsUrl(movieId: number): Promise<IMoviesUrls> {
+    const movie = await this.moviesRepository.findMovieById(movieId);
+
+    return {
+      link: await this.findUrlWithFormData(
+        'query',
+        movie.title,
+        process.env.EXFS_URL,
+      ),
+      site: 'ex-fs',
+    };
+  }
+
+  async findMicrosoftUrl(movieId: number): Promise<IMoviesUrls> {
+    const movie = await this.moviesRepository.findMovieById(movieId);
     try {
-      const microsoftData = await this.httpService.axiosRef.get(
-        process.env.MICROSOFT_URL + parseUrlUtil(title),
+      const { data } = await this.httpService.axiosRef.get(
+        process.env.MICROSOFT_URL + parseUrlUtil(movie.original_title),
       );
 
-      const microsoftUrl = microsoftData?.data?.ResultSets[0]?.Suggests?.find(
+      const microsoftUrl = data?.ResultSets[0]?.Suggests?.find(
         ({ Source }) => Source === 'Movie',
       );
-      return microsoftUrl.Url.replace('//', '');
+
+      return {
+        link: microsoftUrl.Url.replace('//', ''),
+        site: 'microsoft',
+      };
     } catch {
-      return null;
+      return {
+        link: null,
+        site: 'microsoft',
+      };
     }
   }
 
