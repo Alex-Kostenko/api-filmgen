@@ -128,11 +128,11 @@ export default class MoviesService {
     let page = 1;
     const primary_release_year = 2021;
     const sort_by = 'primary_release_date.desc';
-    const primary_release_date = '2021-07-01';
+    // const primary_release_date = '2021-02-07';
 
     setInterval(async () => {
       const { data } = await this.httpService.axiosRef.get<IPagination>(
-        `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.API_KEY}&sort_by=${sort_by}&include_adult=true&page=${page}&language=ru&primary_release_year=${primary_release_year}&primary_release_date.lte=${primary_release_date}`,
+        `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.API_KEY}&sort_by=${sort_by}&include_adult=true&page=${page}&language=ru&primary_release_year=${primary_release_year}`,
         {
           headers: { 'Accept-Encoding': 'gzip,deflate,compress' },
         },

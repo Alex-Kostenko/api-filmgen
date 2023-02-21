@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  Between,
   Brackets,
   LessThanOrEqual,
   Repository,
@@ -170,7 +171,7 @@ export class MoviesRepository {
       .createQueryBuilder('movies')
       .delete()
       .from('movies')
-      .where({ release_date: LessThanOrEqual('2021-10-08') })
+      .where({ release_date: LessThanOrEqual('2021-12-31') })
       .execute();
 
     if (deletedMovies.affected === 0) {
