@@ -55,9 +55,7 @@ export default class MoviesService {
   async findMicrosoftUrl(title: string): Promise<string> {
     try {
       const microsoftData = await this.httpService.axiosRef.get(
-        `https://www.microsoft.com/msstoreapiprod/api/autosuggest?market=en-us&sources=Iris-Products%2CDCatAll-Products%2CMicrosoft-Terms&query=${parseUrlUtil(
-          title,
-        )}`,
+        process.env.MICROSOFT_URL + parseUrlUtil(title),
       );
 
       const microsoftUrl = microsoftData?.data?.ResultSets[0]?.Suggests?.find(
