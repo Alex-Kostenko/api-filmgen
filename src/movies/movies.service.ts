@@ -43,7 +43,22 @@ export default class MoviesService {
     return {
       ...movie,
       urls: [
-        { link: await this.findRezkaUrl(title), site: 'rezka' },
+        {
+          link: await this.findUrlWithFormData(
+            'q',
+            title,
+            process.env.REZKA_URL,
+          ),
+          site: 'rezka',
+        },
+        {
+          link: await this.findUrlWithFormData(
+            'query',
+            title,
+            process.env.EXFS_URL,
+          ),
+          site: 'ex-fs',
+        },
         {
           link: original_title && (await this.findMicrosoftUrl(original_title)),
           site: 'microsoft',
@@ -67,18 +82,19 @@ export default class MoviesService {
     }
   }
 
-  async findRezkaUrl(title: string): Promise<string> {
+  async findUrlWithFormData(
+    query: string,
+    title: string,
+    serchUrl: string,
+  ): Promise<string> {
     try {
       const bodyData = new FormData();
-      bodyData.append('q', title);
-      const rezkaData = await this.httpService.axiosRef.post(
-        process.env.REZKA_URL,
-        bodyData,
-      );
+      bodyData.append(query, title);
+      const { data } = await this.httpService.axiosRef.post(serchUrl, bodyData);
 
-      const rezkaUrl = findUrlUtil(rezkaData.data);
+      const url = findUrlUtil(data);
 
-      return rezkaUrl;
+      return url;
     } catch {
       return null;
     }
