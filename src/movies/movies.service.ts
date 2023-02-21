@@ -102,7 +102,8 @@ export default class MoviesService {
 
     setInterval(async () => {
       const { data } = await this.httpService.axiosRef.get<IPagination>(
-        `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.API_KEY}&sort_by=${sort_by}&include_adult=true&page=${page}&language=ru&primary_release_date.gte=${primary_release_date}`,
+        process.env.MOVIE_API_URL +
+          `&api_key=${process.env.API_KEY}&sort_by=${sort_by}&page=${page}&primary_release_date.gte=${primary_release_date}`,
       );
       if (data) {
         throw new BadRequestException('Not found');
