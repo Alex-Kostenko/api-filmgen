@@ -1,8 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { ProductionCompanyEntity } from 'production_companies/entities/production_company.entity';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
+import { BaseEntity } from '../../../core/entities/base.entity';
 
 @Entity('movies')
-export class MovieEntity {
+export class MovieEntity extends BaseEntity {
+  constructor(partial: Partial<MovieEntity>) {
+    super();
+    Object.assign(this, partial);
+  }
+
   @ApiProperty({ type: Boolean })
   @Column({ type: 'boolean', nullable: false, default: false })
   adult: boolean;
@@ -11,13 +18,17 @@ export class MovieEntity {
   @Column({ type: 'varchar', nullable: true })
   backdrop_path: string;
 
+  @ApiProperty({ type: Number })
+  @Column({ type: 'int', nullable: true })
+  budget: number;
+
   @ApiProperty({ type: Number, isArray: true })
   @Column('int', { array: true })
   genre_ids: number[];
 
-  @ApiProperty({ type: Number, default: 34234 })
-  @PrimaryColumn()
-  id: number;
+  @ApiProperty({ type: String })
+  @Column({ type: 'varchar', nullable: true })
+  imdb_id: string;
 
   @ApiProperty({ type: String })
   @Column({ type: 'varchar', nullable: true })
@@ -39,9 +50,22 @@ export class MovieEntity {
   @Column({ type: 'varchar', nullable: true })
   poster_path: string;
 
+  @ApiProperty({ type: [ProductionCompanyEntity] })
+  @ManyToMany(() => ProductionCompanyEntity)
+  @JoinTable()
+  production_companies: ProductionCompanyEntity[];
+
   @ApiProperty({ type: Date, example: '2021-20-20' })
   @Column({ type: 'date', nullable: true })
   release_date: Date;
+
+  @ApiProperty({ type: Number })
+  @Column({ type: 'int', nullable: true })
+  runtime: number;
+
+  @ApiProperty({ type: String })
+  @Column({ type: 'varchar', nullable: true })
+  status: string;
 
   @ApiProperty({ type: String })
   @Column({ type: 'varchar', nullable: true })

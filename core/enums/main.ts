@@ -8,6 +8,7 @@ export enum Ordering {
   ReleaseDate = 'release_date',
   VoteAverage = 'vote_average',
   VoteCount = 'vote_count',
+  Title = 'title',
 }
 
 export enum Filters {

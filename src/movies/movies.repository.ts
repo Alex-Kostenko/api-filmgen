@@ -37,10 +37,16 @@ export class MoviesRepository {
       query.where('movies.adult = :adult', { adult: false });
     }
 
-    query.orderBy(
-      `movies.${orderBy ? orderBy : Ordering.Popularity}`,
-      dir === SortDirection.Ascend ? 'ASC' : 'DESC',
-    );
+    if (orderBy === Ordering.Title) {
+      query
+        .where('movies.title is not null')
+        .orderBy(`movies.title`, dir === SortDirection.Ascend ? 'ASC' : 'DESC');
+    } else {
+      query.orderBy(
+        `movies.${orderBy ? orderBy : Ordering.Popularity}`,
+        dir === SortDirection.Ascend ? 'ASC' : 'DESC',
+      );
+    }
 
     query.take(pageSize).skip((page - 1) * pageSize);
 
@@ -140,6 +146,7 @@ export class MoviesRepository {
   async findMovieById(movieId: number): Promise<MovieEntity> {
     const searchMovie = await this.movieEntity
       .createQueryBuilder('movies')
+      .leftJoinAndSelect('movies.production_companies', 'production_companies')
       .where('movies.id = :id', { id: movieId })
       .getOne();
 
@@ -180,6 +187,14 @@ export class MoviesRepository {
     try {
       const moviesEntities = this.movieEntity.create(movies);
       await this.movieEntity.save(moviesEntities);
+    } catch {
+      throw new BadRequestException('Bad request');
+    }
+  }
+
+  async saveUpdateOneMovie(movie: MovieEntity): Promise<void> {
+    try {
+      await this.movieEntity.save(movie);
     } catch {
       throw new BadRequestException('Bad request');
     }
