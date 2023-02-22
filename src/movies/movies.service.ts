@@ -1,7 +1,8 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import FormData from 'form-data';
-import { ProductionCompanyRepository } from 'production_companies/production_companies.repository';
+
+import { ProductionCompanyRepository } from '../production_companies/production_companies.repository';
 
 import { IPagination, IPositiveRequest } from '../../core/types/main';
 import { findUrlUtil } from '../../core/utils/find-url.util';
