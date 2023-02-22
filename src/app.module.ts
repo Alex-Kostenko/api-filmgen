@@ -6,6 +6,7 @@ import { configService } from './config/config.service';
 import { FiltersModule } from './filters/filters.module';
 import { GenresModule } from './genres/genres.module';
 import { MoviesModule } from './movies/movies.module';
+import { ProductionCompaniesModule } from './production_companies/production_companies.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { MoviesModule } from './movies/movies.module';
     MoviesModule,
     GenresModule,
     ScheduleModule.forRoot(),
+    ProductionCompaniesModule,
   ],
 })
 export class AppModule {}

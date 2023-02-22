@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import FormData from 'form-data';
+import { ProductionCompanyRepository } from 'production_companies/production_companies.repository';
 
 import { IPagination, IPositiveRequest } from '../../core/types/main';
 import { findUrlUtil } from '../../core/utils/find-url.util';
@@ -18,6 +19,7 @@ import { IMoviesUrls } from './types/main';
 export default class MoviesService {
   constructor(
     private moviesRepository: MoviesRepository,
+    private productionCompamiesRepository: ProductionCompanyRepository,
     private httpService: HttpService,
   ) {}
 
@@ -37,6 +39,22 @@ export default class MoviesService {
   }
 
   async findMovieById(movieId: number): Promise<MovieEntity> {
+    const { data } = await this.httpService.axiosRef.get<MovieEntity>(
+      process.env.MOVIE_API_URL_GET_DETAILS +
+        movieId +
+        `?api_key=${process.env.API_KEY}&language=ru`,
+    );
+
+    if (!data) {
+      throw new BadRequestException('Not found');
+    }
+
+    await this.productionCompamiesRepository.saveProductionCompanies(
+      data.production_companies,
+    );
+
+    await this.moviesRepository.saveUpdateOneMovie(data);
+
     return this.moviesRepository.findMovieById(movieId);
   }
 

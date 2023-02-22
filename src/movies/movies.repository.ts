@@ -140,6 +140,7 @@ export class MoviesRepository {
   async findMovieById(movieId: number): Promise<MovieEntity> {
     const searchMovie = await this.movieEntity
       .createQueryBuilder('movies')
+      .leftJoinAndSelect('movies.production_companies', 'production_companies')
       .where('movies.id = :id', { id: movieId })
       .getOne();
 
@@ -180,6 +181,14 @@ export class MoviesRepository {
     try {
       const moviesEntities = this.movieEntity.create(movies);
       await this.movieEntity.save(moviesEntities);
+    } catch {
+      throw new BadRequestException('Bad request');
+    }
+  }
+
+  async saveUpdateOneMovie(movie: MovieEntity): Promise<void> {
+    try {
+      await this.movieEntity.save(movie);
     } catch {
       throw new BadRequestException('Bad request');
     }
