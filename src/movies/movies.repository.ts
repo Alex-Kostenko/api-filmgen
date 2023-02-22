@@ -6,13 +6,14 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 
-import { Filters, Ordering, SortDirection } from '../../core/enums/main';
+import { Ordering, SortDirection } from '../../core/enums/main';
 
 import { FilterMoviesDto } from './dto/filter-movie.dto';
 import { MaxMinYearResDTO } from './dto/max-min-year.response.dto';
 import { PaginateMoviesDto } from './dto/paginate-movie.dto';
 import { PaginationBodyDTO } from './dto/pagination-body.dto';
 import { MovieEntity } from './entities/movie.entity';
+import { FieldType } from './enums/main';
 import { IMoviesPagination } from './types/main';
 
 @Injectable()
@@ -29,6 +30,7 @@ export class MoviesRepository {
     const { pageSize, page, searchTerm } = paginateMoviesDto;
     const { filters, orderBy, dir, includeAdult, searchInDescription } =
       paginationBodyDTO;
+
     const currentTime = new Date();
     const currentYear = currentTime.getFullYear();
     const query = this.movieEntity.createQueryBuilder('movies');
@@ -98,11 +100,11 @@ export class MoviesRepository {
     const { from, to, field, genres_ids } = filterMoviesDto;
 
     switch (field) {
-      case Filters.Genres:
+      case FieldType.genres:
         query.where('movies.genre_ids && :genres', { genres: genres_ids });
         break;
 
-      case Filters.ReleaseDate:
+      case FieldType.release_date:
         query.andWhere(
           new Brackets((qb) => {
             qb.where('movies.release_date >= :from', {
@@ -114,7 +116,7 @@ export class MoviesRepository {
         );
         break;
 
-      case Filters.VoteAverage:
+      case FieldType.vote_average:
         query.andWhere(
           new Brackets((qb) => {
             qb.where('movies.vote_average >= :from', {
@@ -126,7 +128,7 @@ export class MoviesRepository {
         );
         break;
 
-      case Filters.VoteCount:
+      case FieldType.vote_count:
         query.andWhere(
           new Brackets((qb) => {
             qb.where('movies.vote_count >= :from', {

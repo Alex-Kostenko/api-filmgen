@@ -15,6 +15,8 @@ import { PaginationResDTO } from './dto/pagination.result.dto';
 import { MovieEntity } from './entities/movie.entity';
 import { MoviesRepository } from './movies.repository';
 import { IMoviesUrls } from './types/main';
+import { plainToClass } from 'class-transformer';
+import { FilterMoviesDto } from './dto/filter-movie.dto';
 
 @Injectable()
 export default class MoviesService {
@@ -35,6 +37,9 @@ export default class MoviesService {
 
     return {
       data: result,
+      filters: paginationBodyDTO.filters.map((x) =>
+        plainToClass(FilterMoviesDto, x),
+      ),
       ...paginationBodyDTO,
     };
   }
