@@ -11,7 +11,7 @@ import { PaginationBodyDTO } from './dto/pagination-body.dto';
 import { PaginationResDTO } from './dto/pagination.result.dto';
 import { MovieEntity } from './entities/movie.entity';
 import MoviesService from './movies.service';
-import { IMoviesUrls } from './types/main';
+import { IMoviesUrls, IMovieTrailerResult } from './types/main';
 
 @ApiTags('Movies')
 @Controller('movies')
@@ -54,6 +54,17 @@ export class MoviesController {
     @Param() getMovieByIdDto: GetMovieByIdDto,
   ): Promise<MovieEntity> {
     return this.moviesService.findMovieById(getMovieByIdDto.movieId);
+  }
+
+  @ApiOperation({ summary: 'Get trailer by ID' })
+  @ApiOkResponse({
+    type: MovieEntity,
+  })
+  @Get('get-trailer/:movieId')
+  async findTrailer(
+    @Param() getMovieByIdDto: GetMovieByIdDto,
+  ): Promise<IMovieTrailerResult> {
+    return this.moviesService.findTrailer(getMovieByIdDto.movieId);
   }
 
   @ApiOperation({ summary: 'Get rezka url' })
