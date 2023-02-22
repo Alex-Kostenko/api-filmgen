@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MovieEntity } from 'movies/entities/movie.entity';
+import { MovieEntity } from '../../movies/entities/movie.entity';
 import { Column, Entity, ManyToMany } from 'typeorm';
 import { BaseEntity } from '../../../core/entities/base.entity';
 

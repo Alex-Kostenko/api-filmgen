@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ProductionCompanyEntity } from 'production_companies/entities/production_company.entity';
+import { ProductionCompanyEntity } from '../../production_companies/entities/production_company.entity';
 import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { BaseEntity } from '../../../core/entities/base.entity';
 
