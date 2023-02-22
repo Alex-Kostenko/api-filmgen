@@ -40,23 +40,23 @@ export default class MoviesService {
   }
 
   async findMovieById(movieId: number): Promise<MovieEntity> {
-    const { data } = await this.httpService.axiosRef.get<MovieEntity>(
-      process.env.MOVIE_API_URL_GET_DETAILS +
-        movieId +
-        `?api_key=${process.env.API_KEY}&language=ru`,
-    );
+    try {
+      const { data } = await this.httpService.axiosRef.get<MovieEntity>(
+        process.env.MOVIE_API_URL_GET_DETAILS +
+          movieId +
+          `?api_key=${process.env.API_KEY}&language=ru`,
+      );
 
-    if (!data) {
+      await this.productionCompamiesRepository.saveProductionCompanies(
+        data.production_companies,
+      );
+
+      await this.moviesRepository.saveUpdateOneMovie(data);
+
+      return this.moviesRepository.findMovieById(movieId);
+    } catch {
       throw new BadRequestException('Not found');
     }
-
-    await this.productionCompamiesRepository.saveProductionCompanies(
-      data.production_companies,
-    );
-
-    await this.moviesRepository.saveUpdateOneMovie(data);
-
-    return this.moviesRepository.findMovieById(movieId);
   }
 
   async findRezkaUrl(movieId: number): Promise<IMoviesUrls> {
