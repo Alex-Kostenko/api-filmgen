@@ -37,10 +37,16 @@ export class MoviesRepository {
       query.where('movies.adult = :adult', { adult: false });
     }
 
-    query.orderBy(
-      `movies.${orderBy ? orderBy : Ordering.Popularity}`,
-      dir === SortDirection.Ascend ? 'ASC' : 'DESC',
-    );
+    if (orderBy === Ordering.Title) {
+      query
+        .where('movies.title is not null')
+        .orderBy(`movies.title`, dir === SortDirection.Ascend ? 'ASC' : 'DESC');
+    } else {
+      query.orderBy(
+        `movies.${orderBy ? orderBy : Ordering.Popularity}`,
+        dir === SortDirection.Ascend ? 'ASC' : 'DESC',
+      );
+    }
 
     query.take(pageSize).skip((page - 1) * pageSize);
 
