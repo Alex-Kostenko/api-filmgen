@@ -15,6 +15,7 @@ import { PaginationResDTO } from './dto/pagination.result.dto';
 import { MovieEntity } from './entities/movie.entity';
 import { MoviesRepository } from './movies.repository';
 import { IMoviesUrls, IMovieTrailerResult } from './types/main';
+import { classToPlain, plainToClass } from 'class-transformer';
 
 @Injectable()
 export default class MoviesService {
@@ -40,23 +41,24 @@ export default class MoviesService {
   }
 
   async findMovieById(movieId: number): Promise<MovieEntity> {
-    try {
+    const movie = await this.moviesRepository.findMovieById(movieId);
+    if (!movie.imdb_id) {
       const { data } = await this.httpService.axiosRef.get<MovieEntity>(
         process.env.MOVIE_API_URL_GET_DETAILS +
           movieId +
           `?api_key=${process.env.API_KEY}&language=ru`,
       );
+      if (!data) throw new BadRequestException('No data');
 
-      await this.productionCompamiesRepository.saveProductionCompanies(
+      this.productionCompamiesRepository.saveProductionCompanies(
         data.production_companies,
       );
 
-      await this.moviesRepository.saveUpdateOneMovie(data);
-
-      return this.moviesRepository.findMovieById(movieId);
-    } catch {
-      throw new BadRequestException('Not found');
+      this.moviesRepository.saveUpdateOneMovie(data);
+      return new MovieEntity({ ...movie, ...data });
     }
+
+    return movie;
   }
 
   async findRezkaUrl(movieId: number): Promise<IMoviesUrls> {
