@@ -15,7 +15,6 @@ import { PaginationResDTO } from './dto/pagination.result.dto';
 import { MovieEntity } from './entities/movie.entity';
 import { MoviesRepository } from './movies.repository';
 import { IMoviesUrls, IMovieTrailerResult } from './types/main';
-import { classToPlain, plainToClass } from 'class-transformer';
 
 @Injectable()
 export default class MoviesService {
@@ -120,16 +119,17 @@ export default class MoviesService {
   }
 
   async findTrailer(movieId: number): Promise<IMovieTrailerResult> {
-    try {
-      const { data } = await this.httpService.axiosRef.get<IMovieTrailerResult>(
-        process.env.MOVIE_API_URL_GET_DETAILS +
-          movieId +
-          `/videos?&api_key=${process.env.API_KEY}&language=ru`,
-      );
-      return data;
-    } catch {
-      throw new BadRequestException('Movie is not exist');
+    const { data } = await this.httpService.axiosRef.get<IMovieTrailerResult>(
+      process.env.MOVIE_API_URL_GET_DETAILS +
+        movieId +
+        `/videos?&api_key=${process.env.API_KEY}&language=ru`,
+    );
+
+    if (!data) {
+      throw new BadRequestException('Data is not exist');
     }
+
+    return data;
   }
 
   async getMaxMinYear(): Promise<MaxMinYearResDTO> {

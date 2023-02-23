@@ -139,7 +139,7 @@ export class MoviesRepository {
       .take(movieAmount)
       .getMany();
 
-    if (!serchMovies.length)
+    if (!serchMovies?.length)
       throw new NotFoundException('Movies are not exist');
 
     return serchMovies;
@@ -159,19 +159,18 @@ export class MoviesRepository {
   }
 
   async saveMovies(movies: MovieEntity[]): Promise<void> {
-    try {
-      const moviesEntities = this.movieEntity.create(movies);
-      await this.movieEntity.save(moviesEntities);
-    } catch {
-      throw new BadRequestException('Bad request');
+    const moviesEntities = this.movieEntity.create(movies);
+    const saveMovie = await this.movieEntity.save(moviesEntities);
+
+    if (!saveMovie) {
+      throw new BadRequestException('Couldn`t save movies');
     }
   }
 
   async saveUpdateOneMovie(movie: MovieEntity): Promise<void> {
-    try {
-      await this.movieEntity.save(movie);
-    } catch {
-      throw new BadRequestException('Bad request');
+    const saveMovie = await this.movieEntity.save(movie);
+    if (!saveMovie) {
+      throw new BadRequestException('Couldn`t save movie');
     }
   }
 }

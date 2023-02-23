@@ -14,10 +14,11 @@ export class ProductionCompanyRepository {
   async saveProductionCompanies(
     productionCompanies: ProductionCompanyEntity[],
   ): Promise<void> {
-    try {
-      await this.productionCompanyEntity.save(productionCompanies);
-    } catch {
-      throw new BadRequestException('Bad request');
-    }
+    const saveProductionCompanies = await this.productionCompanyEntity.save(
+      productionCompanies,
+    );
+
+    if (!saveProductionCompanies)
+      throw new BadRequestException('Couldn`t save production companies');
   }
 }
