@@ -1,23 +1,9 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  ValidateNested,
-} from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
+import { GetByIdsDto } from 'genres/dto/get-by-ids.dto';
 import { Ordering, SortDirection } from '../../../core/enums/main';
 
-import { FilterMoviesDto } from './filter-movie.dto';
-
-export class PaginationBodyDTO {
-  @ApiProperty({ type: [FilterMoviesDto] })
-  @ValidateNested({ each: true })
-  @Type(() => FilterMoviesDto)
-  @IsNotEmpty()
-  filters: FilterMoviesDto[];
-
+export class PaginationBodyDTO extends GetByIdsDto {
   @ApiPropertyOptional({
     enum: SortDirection,
     name: 'dir',
@@ -36,13 +22,40 @@ export class PaginationBodyDTO {
   @IsEnum(Ordering)
   orderBy?: Ordering;
 
-  @ApiPropertyOptional({ type: Boolean, name: 'includeAdult', default: false })
+  @ApiPropertyOptional({ type: Boolean, default: false })
   @IsOptional()
   @IsBoolean()
   includeAdult?: boolean;
 
-  @ApiPropertyOptional({ type: Boolean, name: 'searchInDescription' })
+  @ApiPropertyOptional({ type: Boolean })
   @IsOptional()
   @IsBoolean()
   searchInDescription?: boolean;
+
+  @ApiPropertyOptional({
+    type: Number,
+    default: 1,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  voteAvarageFrom?: number;
+
+  @ApiPropertyOptional({ type: Number, default: 50 })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  voteCountFrom?: number;
+
+  @ApiPropertyOptional({ type: Number, default: 1990 })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  releaseDateFrom?: number;
+
+  @ApiPropertyOptional({ type: Number })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  releaseDateTo?: number;
 }
