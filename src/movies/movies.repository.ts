@@ -82,7 +82,7 @@ export class MoviesRepository {
       'movies.vote_average >= :voteAvarage AND movies.vote_count >= :voteCount',
       {
         voteAvarage: voteAvarageFrom ? voteAvarageFrom : 1,
-        voteCount: Number(voteCountFrom),
+        voteCount: voteCountFrom ? voteCountFrom : 0,
       },
     );
 
