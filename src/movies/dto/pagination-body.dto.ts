@@ -1,9 +1,23 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
-import { GetByIdsDto } from 'genres/dto/get-by-ids.dto';
+import {
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  Max,
+  Min,
+} from 'class-validator';
 import { Ordering, SortDirection } from '../../../core/enums/main';
 
-export class PaginationBodyDTO extends GetByIdsDto {
+export class PaginationBodyDTO {
+  @ApiPropertyOptional({ type: Number, isArray: true, default: [] })
+  @IsOptional()
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  @Max(10000000000, { each: true })
+  genres_ids?: number[];
+
   @ApiPropertyOptional({
     enum: SortDirection,
     name: 'dir',

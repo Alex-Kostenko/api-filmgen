@@ -74,7 +74,7 @@ export class MoviesRepository {
       );
     }
 
-    if (genres_ids.length) {
+    if (genres_ids?.length) {
       query.andWhere('movies.genre_ids && :genres', { genres: genres_ids });
     }
 

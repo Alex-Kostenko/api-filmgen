@@ -10,10 +10,3 @@ export enum Ordering {
   VoteCount = 'vote_count',
   Title = 'title',
 }
-
-export enum Filters {
-  ReleaseDate = 'release_date',
-  VoteAverage = 'vote_average',
-  VoteCount = 'vote_count',
-  Genres = 'genres',
-}
