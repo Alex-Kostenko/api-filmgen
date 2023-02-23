@@ -118,16 +118,16 @@ export default class MoviesService {
   }
 
   async findTrailer(movieId: number): Promise<IMovieTrailerResult> {
-    const { data } = await this.httpService.axiosRef.get<IMovieTrailerResult>(
-      process.env.MOVIE_API_URL_GET_DETAILS +
-        movieId +
-        `/videos?&api_key=${process.env.API_KEY}&language=ru`,
-    );
-    if (!data) {
-      throw new BadRequestException('Not found');
+    try {
+      const { data } = await this.httpService.axiosRef.get<IMovieTrailerResult>(
+        process.env.MOVIE_API_URL_GET_DETAILS +
+          movieId +
+          `/videos?&api_key=${process.env.API_KEY}&language=ru`,
+      );
+      return data;
+    } catch {
+      throw new BadRequestException('Movie is not exist');
     }
-
-    return data;
   }
 
   async getMaxMinYear(): Promise<MaxMinYearResDTO> {
