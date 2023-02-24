@@ -14,8 +14,9 @@ export class FiltersService {
 
   async findAll(): Promise<GetAllFiltersRes> {
     const genres = await this.genresRepository.findAll();
-    const yearFilter = await this.moviesRepository.getMaxMinYear();
+    const maxMinFilters =
+      await this.moviesRepository.getMaxMinYearMaxVoteCount();
 
-    return { genres: genres, ...yearFilter };
+    return { genres: genres, ...maxMinFilters };
   }
 }
