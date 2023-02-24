@@ -7,8 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository } from 'typeorm';
 
 import { Ordering, SortDirection } from '../../core/enums/main';
+import { MaxMinFiltersResDTO } from './dto/max-min-filters.response.dto';
 
-import { MaxMinYearResDTO } from './dto/max-min-year.response.dto';
 import { PaginateMoviesDto } from './dto/paginate-movie.dto';
 import { PaginationBodyDTO } from './dto/pagination-body.dto';
 import { MovieEntity } from './entities/movie.entity';
@@ -145,16 +145,22 @@ export class MoviesRepository {
     return serchMovies;
   }
 
-  async getMaxMinYear(): Promise<MaxMinYearResDTO> {
+  async getMaxMinYearMaxVoteCount(): Promise<MaxMinFiltersResDTO> {
     const query = await this.movieEntity
       .createQueryBuilder('movies')
       .select('MAX(movies.release_date)', 'maxYear')
       .addSelect('MIN(movies.release_date)', 'minYear')
+      .addSelect('MAX(movies.vote_count)', 'maxVoteCount')
       .getRawOne();
+
+    if (!query) {
+      throw new NotFoundException('Not found max and min filters');
+    }
 
     return {
       max_year: query.maxYear.getFullYear(),
       min_year: query.minYear.getFullYear(),
+      vote_count: query.maxVoteCount,
     };
   }
 

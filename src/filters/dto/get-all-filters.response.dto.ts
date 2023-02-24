@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { MaxMinFiltersResDTO } from '../../movies/dto/max-min-filters.response.dto';
 
 import { GenreEntity } from '../../genres/entities/genre.entity';
-import { MaxMinYearResDTO } from '../../movies/dto/max-min-year.response.dto';
 
-export class GetAllFiltersRes extends MaxMinYearResDTO {
+export class GetAllFiltersRes extends MaxMinFiltersResDTO {
   @ApiProperty({ type: GenreEntity, isArray: true })
   genres: GenreEntity[];
 }

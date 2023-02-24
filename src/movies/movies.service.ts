@@ -6,8 +6,8 @@ import { IPagination, IPositiveRequest } from '../../core/types/main';
 import { findUrlUtil } from '../../core/utils/find-url.util';
 import { parseUrlUtil } from '../../core/utils/parse-url.util';
 import { ProductionCompanyRepository } from '../production_companies/production_companies.repository';
+import { MaxMinFiltersResDTO } from './dto/max-min-filters.response.dto';
 
-import { MaxMinYearResDTO } from './dto/max-min-year.response.dto';
 import { PaginateMoviesDto } from './dto/paginate-movie.dto';
 import { PaginationBodyDTO } from './dto/pagination-body.dto';
 import { PaginationResDTO } from './dto/pagination.result.dto';
@@ -131,8 +131,8 @@ export default class MoviesService {
     return data;
   }
 
-  async getMaxMinYear(): Promise<MaxMinYearResDTO> {
-    return this.moviesRepository.getMaxMinYear();
+  async getMaxMinYearMaxVoteCount(): Promise<MaxMinFiltersResDTO> {
+    return this.moviesRepository.getMaxMinYearMaxVoteCount();
   }
 
   async fetchMovies(): Promise<IPositiveRequest> {
