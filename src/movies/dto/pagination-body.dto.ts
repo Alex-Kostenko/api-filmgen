@@ -8,6 +8,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
+
 import { Ordering, SortDirection } from '../../../core/enums/main';
 
 export class PaginationBodyDTO {

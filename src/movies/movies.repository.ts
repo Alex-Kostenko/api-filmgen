@@ -48,7 +48,7 @@ export class MoviesRepository {
     if (orderBy === Ordering.Title) {
       query
         .andWhere('movies.title is not null')
-        .orderBy(`movies.title`, dir === SortDirection.Ascend ? 'ASC' : 'DESC');
+        .orderBy('movies.title', dir === SortDirection.Ascend ? 'ASC' : 'DESC');
     } else {
       query.orderBy(
         `movies.${orderBy ? orderBy : Ordering.Popularity}`,
