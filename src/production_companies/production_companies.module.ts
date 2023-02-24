@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { ProductionCompanyEntity } from './entities/production_company.entity';
 import { ProductionCompanyRepository } from './production_companies.repository';
 

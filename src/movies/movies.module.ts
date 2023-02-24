@@ -1,6 +1,7 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { ProductionCompaniesModule } from '../production_companies/production_companies.module';
 
 import { MovieEntity } from './entities/movie.entity';

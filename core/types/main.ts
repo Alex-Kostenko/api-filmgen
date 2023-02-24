@@ -10,3 +10,16 @@ export interface IPagination {
   total_pages: number;
   total_results: number;
 }
+
+export type TokenType = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+export interface IPositiveRequest {
+  success: boolean;
+}
+
+export interface TODO_ANY {
+  [name: string]: any;
+}

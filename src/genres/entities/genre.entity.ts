@@ -1,12 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity } from 'typeorm';
+
+import { BaseEntity } from '../../../core/entities/base.entity';
 
 @Entity('genres')
-export class GenreEntity {
-  @ApiProperty({ type: Number, default: 34234 })
-  @PrimaryColumn()
-  id: number;
-
+export class GenreEntity extends BaseEntity {
   @ApiProperty({ type: String })
   @Column({ type: 'varchar', length: '400', nullable: false })
   name: string;

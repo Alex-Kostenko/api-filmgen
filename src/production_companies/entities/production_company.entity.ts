@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MovieEntity } from '../../movies/entities/movie.entity';
 import { Column, Entity, ManyToMany } from 'typeorm';
+
 import { BaseEntity } from '../../../core/entities/base.entity';
+import { MovieEntity } from '../../movies/entities/movie.entity';
 
 @Entity('production_companies')
 export class ProductionCompanyEntity extends BaseEntity {

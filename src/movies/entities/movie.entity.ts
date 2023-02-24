@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ProductionCompanyEntity } from '../../production_companies/entities/production_company.entity';
 import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
+
+import { UserEntity } from '../../users/entities/user.entity';
+
 import { BaseEntity } from '../../../core/entities/base.entity';
+import { ProductionCompanyEntity } from '../../production_companies/entities/production_company.entity';
 
 @Entity('movies')
 export class MovieEntity extends BaseEntity {
@@ -82,4 +85,8 @@ export class MovieEntity extends BaseEntity {
   @ApiProperty({ type: Number })
   @Column({ type: 'int', nullable: false, default: 0 })
   vote_count: number;
+
+  @ApiProperty({ type: [UserEntity] })
+  @ManyToMany(() => UserEntity)
+  users: UserEntity[];
 }

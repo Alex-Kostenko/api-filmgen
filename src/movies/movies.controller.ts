@@ -2,8 +2,8 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { IPositiveRequest } from '../../core/types/main';
-import { FindMovieUrlDto } from './dto/find-movie-url.dto';
 
+import { FindMovieUrlDto } from './dto/find-movie-url.dto';
 import { GetLastPopularDto } from './dto/get-last-popular.dto';
 import { GetMovieByIdDto } from './dto/get-movie-by-id.dto';
 import { PaginateMoviesDto } from './dto/paginate-movie.dto';
