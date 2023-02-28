@@ -25,20 +25,6 @@ export class GenresRepository {
       .getMany();
   }
 
-  async findByIds(idsArray: number[]): Promise<GenreEntity[]> {
-    if (!idsArray.length)
-      throw new BadRequestException('idsArray cannot be empty');
-
-    const searchGenres = await this.genreEntity
-      .createQueryBuilder('genres')
-      .where('genres.id IN (:...ids)', { ids: idsArray })
-      .orderBy('genres.name')
-      .getMany();
-
-    if (!searchGenres) throw new NotFoundException('Genres is not exist');
-    return searchGenres;
-  }
-
   async saveGenres(data: IData): Promise<IPositiveRequest> {
     try {
       const genresEntities = this.genreEntity.create(data.genres);

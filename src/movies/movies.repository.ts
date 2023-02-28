@@ -7,8 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository } from 'typeorm';
 
 import { Ordering, SortDirection } from '../../core/enums/main';
-import { MaxMinFiltersResDTO } from './dto/max-min-filters.response.dto';
 
+import { MaxMinFiltersResDTO } from './dto/max-min-filters.response.dto';
 import { PaginateMoviesDto } from './dto/paginate-movie.dto';
 import { PaginationBodyDTO } from './dto/pagination-body.dto';
 import { MovieEntity } from './entities/movie.entity';
