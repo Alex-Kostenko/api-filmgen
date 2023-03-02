@@ -47,7 +47,9 @@ export class MoviesRepository {
 
     if (orderBy === Ordering.Title) {
       query
-        .andWhere('movies.title is not null')
+        .andWhere(
+          `movies.title is not null AND movies.title ~ '^[a-zA-Zа-яА-Я .:]+$'`,
+        )
         .orderBy('movies.title', dir === SortDirection.Ascend ? 'ASC' : 'DESC');
     } else {
       query.orderBy(
