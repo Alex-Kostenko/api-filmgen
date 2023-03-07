@@ -13,7 +13,7 @@ import { PaginationBodyDTO } from './dto/pagination-body.dto';
 import { PaginationResDTO } from './dto/pagination.result.dto';
 import { MovieEntity } from './entities/movie.entity';
 import { MoviesRepository } from './movies.repository';
-import { IMoviesUrls, IMovieTrailerResult } from './types/main';
+import { IMoviesUrls, IMovieTrailer, IMovieTrailerResult } from './types/main';
 
 @Injectable()
 export default class MoviesService {
@@ -117,7 +117,7 @@ export default class MoviesService {
     return this.moviesRepository.findLastPopular(getLastPopularDto);
   }
 
-  async findTrailer(movieId: number): Promise<IMovieTrailerResult> {
+  async findTrailer(movieId: number): Promise<IMovieTrailer> {
     const { data } = await this.httpService.axiosRef.get<IMovieTrailerResult>(
       process.env.MOVIE_API_URL_GET_DETAILS +
         movieId +
@@ -128,7 +128,9 @@ export default class MoviesService {
       throw new BadRequestException('Data is not exist');
     }
 
-    return data;
+    const firstResult = data.results.at(0) ? data.results.at(0) : {};
+
+    return firstResult;
   }
 
   async getMaxMinYearMaxVoteCount(): Promise<MaxMinFiltersResDTO> {
