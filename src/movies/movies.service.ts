@@ -113,6 +113,10 @@ export default class MoviesService {
     }
   }
 
+  async findMoviesIds(): Promise<number[]> {
+    return this.moviesRepository.findMoviesIds();
+  }
+
   async findLastPopular(getLastPopularDto: number): Promise<MovieEntity[]> {
     return this.moviesRepository.findLastPopular(getLastPopularDto);
   }

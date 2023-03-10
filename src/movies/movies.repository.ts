@@ -48,7 +48,7 @@ export class MoviesRepository {
     if (orderBy === Ordering.Title) {
       query
         .andWhere(
-          `movies.title is not null AND movies.title ~ '^[a-zA-Zа-яА-Я .:]+$'`,
+          "movies.title is not null AND movies.title ~ '^[a-zA-Zа-яА-Я .:]+$'",
         )
         .orderBy('movies.title', dir === SortDirection.Ascend ? 'ASC' : 'DESC');
     } else {
@@ -180,5 +180,14 @@ export class MoviesRepository {
     if (!saveMovie) {
       throw new BadRequestException('Couldn`t save movie');
     }
+  }
+
+  async findMoviesIds(): Promise<number[]> {
+    return (
+      await this.movieEntity
+        .createQueryBuilder('movies')
+        .select('movies.id')
+        .getMany()
+    ).map((movies) => movies.id);
   }
 }

@@ -30,6 +30,16 @@ export class MoviesController {
     return this.moviesService.findLastPopular(getLastPopularDto.moviesAmount);
   }
 
+  @ApiOperation({ summary: 'Get all movies ids' })
+  @ApiOkResponse({
+    type: Number,
+    isArray: true,
+  })
+  @Get('movies-ids')
+  async findMoviesIds(): Promise<number[]> {
+    return this.moviesService.findMoviesIds();
+  }
+
   @ApiOperation({ summary: 'Get movie with pagination, sort and filter' })
   @ApiOkResponse({
     type: PaginationResDTO,
