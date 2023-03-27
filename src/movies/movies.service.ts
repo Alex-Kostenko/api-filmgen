@@ -40,20 +40,22 @@ export default class MoviesService {
 
   async findMovieById(movieId: number): Promise<MovieEntity> {
     const movie = await this.moviesRepository.findMovieById(movieId);
-    if (!movie.imdb_id) {
-      const { data } = await this.httpService.axiosRef.get<MovieEntity>(
-        process.env.MOVIE_API_URL_GET_DETAILS +
-          movieId +
-          `?api_key=${process.env.API_KEY}&language=ru`,
-      );
-      if (!data) throw new BadRequestException('No data');
+    try {
+      if (!movie.imdb_id) {
+        const { data } = await this.httpService.axiosRef.get<MovieEntity>(
+          process.env.MOVIE_API_URL_GET_DETAILS +
+            movieId +
+            `?api_key=${process.env.API_KEY}&language=ru`,
+        );
+        await this.productionCompamiesRepository.saveProductionCompanies(
+          data.production_companies,
+        );
 
-      this.productionCompamiesRepository.saveProductionCompanies(
-        data.production_companies,
-      );
-
-      this.moviesRepository.saveUpdateOneMovie(data);
-      return new MovieEntity({ ...movie, ...data });
+        await this.moviesRepository.saveUpdateOneMovie(data);
+        return new MovieEntity({ ...movie, ...data });
+      }
+    } catch {
+      return movie;
     }
 
     return movie;
