@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { GetByIdsDto } from './dto/get-by-ids.dto';
 import { GenreEntity } from './entities/genre.entity';
 import { GenresService } from './genres.service';
 
@@ -15,12 +14,5 @@ export class GenresController {
   @Get('all')
   findAllGenres(): Promise<GenreEntity[]> {
     return this.genresService.findAll();
-  }
-
-  @ApiOperation({ summary: 'Get genres by ids' })
-  @ApiOkResponse({ type: GenreEntity, isArray: true })
-  @Post('ids')
-  findByIds(@Body() idsArray: GetByIdsDto): Promise<GenreEntity[]> {
-    return this.genresService.findByIds(idsArray);
   }
 }

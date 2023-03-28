@@ -4,12 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 
-import { Filters, Ordering, SortDirection } from '../../core/enums/main';
+import { Ordering, SortDirection } from '../../core/enums/main';
 
-import { FilterMoviesDto } from './dto/filter-movie.dto';
-import { MaxMinYearResDTO } from './dto/max-min-year.response.dto';
+import { MaxMinFiltersResDTO } from './dto/max-min-filters.response.dto';
 import { PaginateMoviesDto } from './dto/paginate-movie.dto';
 import { PaginationBodyDTO } from './dto/pagination-body.dto';
 import { MovieEntity } from './entities/movie.entity';
@@ -27,8 +26,17 @@ export class MoviesRepository {
     paginationBodyDTO: PaginationBodyDTO,
   ): Promise<IMoviesPagination> {
     const { pageSize, page, searchTerm } = paginateMoviesDto;
-    const { filters, orderBy, dir, includeAdult, searchInDescription } =
-      paginationBodyDTO;
+    const {
+      orderBy,
+      dir,
+      includeAdult,
+      searchInDescription,
+      voteAvarageFrom,
+      voteCountFrom,
+      releaseDateFrom,
+      releaseDateTo,
+      genres_ids,
+    } = paginationBodyDTO;
     const currentTime = new Date();
     const currentYear = currentTime.getFullYear();
     const query = this.movieEntity.createQueryBuilder('movies');
@@ -39,7 +47,9 @@ export class MoviesRepository {
 
     if (orderBy === Ordering.Title) {
       query
-        .where('movies.title is not null')
+        .andWhere(
+          "movies.title is not null AND movies.title ~ '^[a-zA-Zа-яА-Я .:]+$'",
+        )
         .orderBy('movies.title', dir === SortDirection.Ascend ? 'ASC' : 'DESC');
     } else {
       query.orderBy(
@@ -52,11 +62,31 @@ export class MoviesRepository {
 
     if (!query) throw new BadRequestException('No such page');
 
-    if (filters.length) {
-      for await (const filter of filters) {
-        this.filterMovies(query, filter, currentYear);
-      }
+    if (releaseDateFrom || releaseDateTo) {
+      query.andWhere(
+        `movies.release_date BETWEEN '${
+          releaseDateFrom && releaseDateFrom > 1990 ? releaseDateFrom : 1990
+        }-01-01' AND '${
+          releaseDateTo &&
+          releaseDateFrom > 1990 &&
+          releaseDateTo > releaseDateFrom
+            ? releaseDateTo
+            : currentYear
+        }-12-31'`,
+      );
     }
+
+    if (genres_ids?.length) {
+      query.andWhere('movies.genre_ids && :genres', { genres: genres_ids });
+    }
+
+    query.andWhere(
+      'movies.vote_average >= :voteAvarage AND movies.vote_count >= :voteCount',
+      {
+        voteAvarage: voteAvarageFrom ? voteAvarageFrom : 1,
+        voteCount: voteCountFrom ? voteCountFrom : 0,
+      },
+    );
 
     if (searchTerm) {
       const trimmedSearch = searchTerm.trim();
@@ -90,59 +120,6 @@ export class MoviesRepository {
     };
   }
 
-  async filterMovies(
-    query: SelectQueryBuilder<MovieEntity>,
-    filterMoviesDto: FilterMoviesDto,
-    currentYear: number,
-  ) {
-    const { from, to, field, genres_ids } = filterMoviesDto;
-
-    switch (field) {
-      case Filters.Genres:
-        query.where('movies.genre_ids && :genres', { genres: genres_ids });
-        break;
-
-      case Filters.ReleaseDate:
-        query.andWhere(
-          new Brackets((qb) => {
-            qb.where('movies.release_date >= :from', {
-              from: `${from ? from : 1990}-01-01`,
-            }).andWhere('movies.release_date <= :to', {
-              to: `${to ? to : currentYear}-12-31`,
-            });
-          }),
-        );
-        break;
-
-      case Filters.VoteAverage:
-        query.andWhere(
-          new Brackets((qb) => {
-            qb.where('movies.vote_average >= :from', {
-              from: from,
-            }).andWhere('movies.vote_average <= :to', {
-              to: to,
-            });
-          }),
-        );
-        break;
-
-      case Filters.VoteCount:
-        query.andWhere(
-          new Brackets((qb) => {
-            qb.where('movies.vote_count >= :from', {
-              from: from,
-            }).andWhere('movies.vote_count <= :to', {
-              to: to,
-            });
-          }),
-        );
-        break;
-
-      default:
-        break;
-    }
-  }
-
   async findMovieById(movieId: number): Promise<MovieEntity> {
     const searchMovie = await this.movieEntity
       .createQueryBuilder('movies')
@@ -164,39 +141,53 @@ export class MoviesRepository {
       .take(movieAmount)
       .getMany();
 
-    if (!serchMovies.length)
+    if (!serchMovies?.length)
       throw new NotFoundException('Movies are not exist');
 
     return serchMovies;
   }
 
-  async getMaxMinYear(): Promise<MaxMinYearResDTO> {
+  async getMaxMinYearMaxVoteCount(): Promise<MaxMinFiltersResDTO> {
     const query = await this.movieEntity
       .createQueryBuilder('movies')
       .select('MAX(movies.release_date)', 'maxYear')
       .addSelect('MIN(movies.release_date)', 'minYear')
+      .addSelect('MAX(movies.vote_count)', 'maxVoteCount')
       .getRawOne();
+
+    if (!query) {
+      throw new NotFoundException('Not found max and min filters');
+    }
 
     return {
       max_year: query.maxYear.getFullYear(),
       min_year: query.minYear.getFullYear(),
+      vote_count: query.maxVoteCount,
     };
   }
 
   async saveMovies(movies: MovieEntity[]): Promise<void> {
-    try {
-      const moviesEntities = this.movieEntity.create(movies);
-      await this.movieEntity.save(moviesEntities);
-    } catch {
-      throw new BadRequestException('Bad request');
+    const moviesEntities = this.movieEntity.create(movies);
+    const saveMovie = await this.movieEntity.save(moviesEntities);
+
+    if (!saveMovie) {
+      throw new BadRequestException('Couldn`t save movies');
     }
   }
 
   async saveUpdateOneMovie(movie: MovieEntity): Promise<void> {
-    try {
-      await this.movieEntity.save(movie);
-    } catch {
-      throw new BadRequestException('Bad request');
+    const saveMovie = await this.movieEntity.save(movie);
+    if (!saveMovie) {
+      throw new BadRequestException('Couldn`t save movie');
     }
+  }
+
+  async findMoviesIds(): Promise<number[]> {
+    return (
+      await this.movieEntity
+        .createQueryBuilder('movies')
+        .select('movies.id')
+        .getMany()
+    ).map((movies) => movies.id);
   }
 }

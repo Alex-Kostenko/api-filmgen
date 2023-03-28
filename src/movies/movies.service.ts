@@ -7,13 +7,14 @@ import { findUrlUtil } from '../../core/utils/find-url.util';
 import { parseUrlUtil } from '../../core/utils/parse-url.util';
 import { ProductionCompanyRepository } from '../production_companies/production_companies.repository';
 
-import { MaxMinYearResDTO } from './dto/max-min-year.response.dto';
+import { MaxMinFiltersResDTO } from './dto/max-min-filters.response.dto';
 import { PaginateMoviesDto } from './dto/paginate-movie.dto';
 import { PaginationBodyDTO } from './dto/pagination-body.dto';
 import { PaginationResDTO } from './dto/pagination.result.dto';
 import { MovieEntity } from './entities/movie.entity';
 import { MoviesRepository } from './movies.repository';
-import { IMoviesUrls, IMovieTrailerResult } from './types/main';
+
+import { IMoviesUrls, IMovieTrailer, IMovieTrailerResult } from './types/main';
 
 @Injectable()
 export default class MoviesService {
@@ -40,20 +41,22 @@ export default class MoviesService {
 
   async findMovieById(movieId: number): Promise<MovieEntity> {
     const movie = await this.moviesRepository.findMovieById(movieId);
-    if (!movie.imdb_id) {
-      const { data } = await this.httpService.axiosRef.get<MovieEntity>(
-        process.env.MOVIE_API_URL_GET_DETAILS +
-          movieId +
-          `?api_key=${process.env.API_KEY}&language=ru`,
-      );
-      if (!data) throw new BadRequestException('No data');
+    try {
+      if (!movie.imdb_id) {
+        const { data } = await this.httpService.axiosRef.get<MovieEntity>(
+          process.env.MOVIE_API_URL_GET_DETAILS +
+            movieId +
+            `?api_key=${process.env.API_KEY}&language=ru`,
+        );
+        await this.productionCompamiesRepository.saveProductionCompanies(
+          data.production_companies,
+        );
 
-      this.productionCompamiesRepository.saveProductionCompanies(
-        data.production_companies,
-      );
-
-      this.moviesRepository.saveUpdateOneMovie(data);
-      return new MovieEntity({ ...movie, ...data });
+        await this.moviesRepository.saveUpdateOneMovie(data);
+        return new MovieEntity({ ...movie, ...data });
+      }
+    } catch {
+      return movie;
     }
 
     return movie;
@@ -113,25 +116,32 @@ export default class MoviesService {
     }
   }
 
+  async findMoviesIds(): Promise<number[]> {
+    return this.moviesRepository.findMoviesIds();
+  }
+
   async findLastPopular(getLastPopularDto: number): Promise<MovieEntity[]> {
     return this.moviesRepository.findLastPopular(getLastPopularDto);
   }
 
-  async findTrailer(movieId: number): Promise<IMovieTrailerResult> {
-    try {
-      const { data } = await this.httpService.axiosRef.get<IMovieTrailerResult>(
-        process.env.MOVIE_API_URL_GET_DETAILS +
-          movieId +
-          `/videos?&api_key=${process.env.API_KEY}&language=ru`,
-      );
-      return data;
-    } catch {
-      throw new BadRequestException('Movie is not exist');
+  async findTrailer(movieId: number): Promise<IMovieTrailer> {
+    const { data } = await this.httpService.axiosRef.get<IMovieTrailerResult>(
+      process.env.MOVIE_API_URL_GET_DETAILS +
+        movieId +
+        `/videos?&api_key=${process.env.API_KEY}&language=ru`,
+    );
+
+    if (!data) {
+      throw new BadRequestException('Data is not exist');
     }
+
+    const firstResult = data.results.at(0) ? data.results.at(0) : {};
+
+    return firstResult;
   }
 
-  async getMaxMinYear(): Promise<MaxMinYearResDTO> {
-    return this.moviesRepository.getMaxMinYear();
+  async getMaxMinYearMaxVoteCount(): Promise<MaxMinFiltersResDTO> {
+    return this.moviesRepository.getMaxMinYearMaxVoteCount();
   }
 
   async fetchMovies(): Promise<IPositiveRequest> {

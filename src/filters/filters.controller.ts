@@ -12,7 +12,7 @@ export class FiltersController {
   @ApiOperation({ summary: 'Get all filters' })
   @ApiOkResponse({ type: GetAllFiltersRes })
   @Get('all')
-  findAllGenres(): Promise<GetAllFiltersRes> {
+  findAllFilters(): Promise<GetAllFiltersRes> {
     return this.filtersService.findAll();
   }
 }

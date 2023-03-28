@@ -11,7 +11,7 @@ import { PaginationBodyDTO } from './dto/pagination-body.dto';
 import { PaginationResDTO } from './dto/pagination.result.dto';
 import { MovieEntity } from './entities/movie.entity';
 import MoviesService from './movies.service';
-import { IMoviesUrls, IMovieTrailerResult } from './types/main';
+import { IMoviesUrls, IMovieTrailer } from './types/main';
 
 @ApiTags('Movies')
 @Controller('movies')
@@ -28,6 +28,16 @@ export class MoviesController {
     @Query() getLastPopularDto: GetLastPopularDto,
   ): Promise<MovieEntity[]> {
     return this.moviesService.findLastPopular(getLastPopularDto.moviesAmount);
+  }
+
+  @ApiOperation({ summary: 'Get all movies ids' })
+  @ApiOkResponse({
+    type: Number,
+    isArray: true,
+  })
+  @Get('movies-ids')
+  async findMoviesIds(): Promise<number[]> {
+    return this.moviesService.findMoviesIds();
   }
 
   @ApiOperation({ summary: 'Get movie with pagination, sort and filter' })
@@ -63,7 +73,7 @@ export class MoviesController {
   @Get('get-trailer/:movieId')
   async findTrailer(
     @Param() getMovieByIdDto: GetMovieByIdDto,
-  ): Promise<IMovieTrailerResult> {
+  ): Promise<IMovieTrailer> {
     return this.moviesService.findTrailer(getMovieByIdDto.movieId);
   }
 
