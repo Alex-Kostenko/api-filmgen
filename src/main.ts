@@ -13,6 +13,17 @@ async function bootstrap() {
   const options = new DocumentBuilder()
     .setTitle('Api Filmgem')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        description: 'Enter JWT token',
+        scheme: 'bearer',
+        name: 'Authorization',
+        in: 'header',
+        bearerFormat: 'JWT',
+      },
+      'JWT-auth',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, options);

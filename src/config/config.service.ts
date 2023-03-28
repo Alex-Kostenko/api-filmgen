@@ -28,11 +28,6 @@ class ConfigService {
       synchronize: true,
       logging: true,
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-      ssl: this.getValue('DATABASE_URL_PROD')
-        ? {
-            rejectUnauthorized: false,
-          }
-        : false,
     };
   }
 }
