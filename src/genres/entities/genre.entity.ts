@@ -10,10 +10,10 @@ export class GenreEntity extends BaseEntity {
   name: string;
 
   @ApiProperty({ type: String })
-  @Column({ type: 'varchar', length: '400', nullable: true })
+  @Column({ type: 'varchar', length: '400', nullable: false })
   name_eng: string;
 
   @ApiProperty({ type: String })
-  @Column({ type: 'varchar', length: '400', nullable: true })
+  @Column({ type: 'varchar', length: '400', nullable: false })
   name_ukr: string;
 }
