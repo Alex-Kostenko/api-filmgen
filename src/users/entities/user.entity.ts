@@ -32,7 +32,7 @@ export class UserEntity {
   email: string;
 
   @ApiProperty({ type: String })
-  @Column({ type: 'varchar', length: '2000', nullable: false, select: false })
+  @Column({ type: 'varchar', length: '2000', nullable: false })
   password: string;
 
   @ApiProperty({ type: String })
@@ -44,7 +44,7 @@ export class UserEntity {
   refreshToken?: string;
 
   @ApiProperty({ type: [MovieEntity] })
-  @ManyToMany(() => MovieEntity)
+  @ManyToMany(() => MovieEntity, { onDelete: 'SET NULL' })
   @JoinTable()
   movies: MovieEntity[];
 

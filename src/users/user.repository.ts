@@ -31,7 +31,10 @@ export class UserRepository {
       throw new BadRequestException('Email is already exist');
     }
 
-    await this.userEntity.insert(registerUserDto);
+    const newUser = new UserEntity();
+    Object.assign(newUser, registerUserDto);
+
+    await this.userEntity.insert(newUser);
 
     return { success: true };
   }

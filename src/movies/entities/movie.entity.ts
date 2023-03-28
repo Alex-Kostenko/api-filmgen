@@ -87,6 +87,6 @@ export class MovieEntity extends BaseEntity {
   vote_count: number;
 
   @ApiProperty({ type: [UserEntity] })
-  @ManyToMany(() => UserEntity)
+  @ManyToMany(() => UserEntity, { onDelete: 'SET NULL' })
   users: UserEntity[];
 }
