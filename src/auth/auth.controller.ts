@@ -15,6 +15,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { UserRepository } from 'users/user.repository';
+import { UsersService } from 'users/users.service';
 
 import { IPositiveRequest, TokenType } from '../../core/types/main';
 import { User } from '../users/decorator/user.decorator';
@@ -32,6 +34,7 @@ import { RefreshTokenGuard } from './guards/refresh-token.guard';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
+    private readonly userRepository: UserRepository,
     private jwtService: JwtService,
   ) {}
   @ApiOperation({ summary: 'Log in' })
@@ -74,8 +77,8 @@ export class AuthController {
   })
   @UseGuards(JWTAuthGuard)
   @Get('profile')
-  getProfile(@User() user: UserEntity): RegisterUserDto {
-    return user;
+  getProfile(@User() user: UserEntity): Promise<UserEntity> {
+    return this.userRepository.findOneByEmail(user.email);
   }
 
   @ApiBearerAuth('JWT-auth')

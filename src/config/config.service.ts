@@ -25,7 +25,7 @@ class ConfigService {
       type: 'postgres',
       url: this.getValue('DATABASE_URL'),
       password: this.getValue('DATABASE_PASSWORD'),
-      synchronize: true,
+      // synchronize: true,
       logging: true,
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     };

@@ -30,6 +30,9 @@ export class UserRepository {
     if (user) {
       throw new BadRequestException('Email is already exist');
     }
+    if (user.username === registerUserDto.username) {
+      throw new BadRequestException('Username is already exist');
+    }
 
     const newUser = new UserEntity();
     Object.assign(newUser, registerUserDto);
@@ -65,8 +68,13 @@ export class UserRepository {
   }
 
   async findOneByEmail(userEmail: string): Promise<UserEntity> {
-    const user = await this.userEntity.findOne({
+    const user = this.userEntity.findOne({
       where: { email: userEmail },
+      select: {
+        username: true,
+        id: true,
+        email: true,
+      },
     });
 
     if (!user) {
