@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 
 import { RegisterUserDto } from '../auth/dto/register-user.dto';
 import { IPositiveRequest } from '../../core/types/main';
@@ -85,29 +85,28 @@ export class UserRepository {
     user: UserEntity,
     updateUserDto: UpdateUserDto,
   ): Promise<IPositiveRequest> {
+    const { email, username } = updateUserDto;
     const serchUser = await this.findOneById(user.id);
 
-    if (user.email) {
-      await this.checkExistingRecord(
-        this.userEntity,
-        'email',
-        user.email,
-        'Email is already exist!',
-      );
-    }
-
-    if (user.username) {
-      await this.checkExistingRecord(
-        this.userEntity,
-        'username',
-        user.username,
-        'Username is already exist!',
-      );
+    if (email || username) {
+      const equalUser = await this.userEntity.findOne({
+        where: {
+          id: Not(user.id),
+          ...(email && { updateUserDto: email }),
+          ...(username && { username: username }),
+        },
+      });
+      if (equalUser) {
+        const message = email
+          ? 'Email is already exist!'
+          : 'Username is already exist!';
+        throw new BadRequestException(message);
+      }
     }
 
     Object.assign(serchUser, updateUserDto);
 
-    await this.userEntity.save(user);
+    await this.userEntity.save(serchUser);
 
     return { success: true };
   }
@@ -170,17 +169,5 @@ export class UserRepository {
     return {
       success: true,
     };
-  }
-
-  async checkExistingRecord(
-    entity: any,
-    field: string,
-    value: any,
-    errorMessage: string,
-  ) {
-    const existingRecord = await entity.findOne({ where: { [field]: value } });
-    if (existingRecord) {
-      throw new BadRequestException(errorMessage);
-    }
   }
 }
