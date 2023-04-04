@@ -15,8 +15,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserRepository } from 'users/user.repository';
-import { UsersService } from 'users/users.service';
+import { UserRepository } from '../users/user.repository';
 
 import { IPositiveRequest, TokenType } from '../../core/types/main';
 import { User } from '../users/decorator/user.decorator';
