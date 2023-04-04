@@ -154,7 +154,6 @@ export class UserRepository {
       changePassowrdDto.currentPassword,
       user.password,
     );
-    console.log(isPassEquals);
 
     if (!isPassEquals) {
       throw new BadRequestException('Current password is incorrect!');
