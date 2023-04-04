@@ -68,7 +68,7 @@ export class UserRepository {
   }
 
   async findOneByEmail(userEmail: string): Promise<UserEntity> {
-    const user = this.userEntity.findOne({
+    const user = await this.userEntity.findOne({
       where: { email: userEmail },
       select: {
         username: true,
