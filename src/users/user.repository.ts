@@ -87,11 +87,22 @@ export class UserRepository {
   ): Promise<IPositiveRequest> {
     const serchUser = await this.findOneById(user.id);
 
-    if (
-      updateUserDto.email === serchUser.email ||
-      updateUserDto.username === serchUser.username
-    ) {
-      throw new BadRequestException('Email or username is already exist!');
+    if (user.email) {
+      await this.checkExistingRecord(
+        this.userEntity,
+        'email',
+        user.email,
+        'Email is already exist!',
+      );
+    }
+
+    if (user.username) {
+      await this.checkExistingRecord(
+        this.userEntity,
+        'username',
+        user.username,
+        'Username is already exist!',
+      );
     }
 
     Object.assign(serchUser, updateUserDto);
@@ -160,5 +171,17 @@ export class UserRepository {
     return {
       success: true,
     };
+  }
+
+  async checkExistingRecord(
+    entity: any,
+    field: string,
+    value: any,
+    errorMessage: string,
+  ) {
+    const existingRecord = await entity.findOne({ where: { [field]: value } });
+    if (existingRecord) {
+      throw new BadRequestException(errorMessage);
+    }
   }
 }
