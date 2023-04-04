@@ -88,23 +88,26 @@ export class UserRepository {
     const { email, username } = updateUserDto;
     const serchUser = await this.findOneById(user.id);
 
-    if (email || username) {
-      const equalUser = await this.userEntity.findOne({
-        where: {
-          id: Not(user.id),
-          ...(email && { updateUserDto: email }),
-          ...(username && { username: username }),
-        },
+    if (email) {
+      const equalEmail = await this.userEntity.findOne({
+        where: { email: email, id: Not(user.id) },
       });
-      if (equalUser) {
-        const message = email
-          ? 'Email is already exist!'
-          : 'Username is already exist!';
-        throw new BadRequestException(message);
+      if (equalEmail) {
+        throw new BadRequestException('Email is already exist!');
+      }
+    }
+
+    if (username) {
+      const equalUsername = await this.userEntity.findOne({
+        where: { email: email, id: Not(user.id) },
+      });
+      if (equalUsername) {
+        throw new BadRequestException('Username is already exist!');
       }
     }
 
     Object.assign(serchUser, updateUserDto);
+    console.log(serchUser);
 
     await this.userEntity.save(serchUser);
 
