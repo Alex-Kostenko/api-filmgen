@@ -19,7 +19,7 @@ export class UserEntity {
   id: string;
 
   @ApiProperty({ type: String })
-  @Column({ type: 'varchar', length: '200', nullable: false })
+  @Column({ type: 'varchar', length: '200' })
   username: string;
 
   @ApiProperty({ type: String })

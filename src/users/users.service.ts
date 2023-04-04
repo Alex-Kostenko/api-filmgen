@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { IPositiveRequest } from '../../core/types/main';
+import { ChangePasswordDTO } from './dto/change-password.dto';
 
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
@@ -19,11 +21,15 @@ export class UsersService {
   async update(
     user: UserEntity,
     updateUserDto: UpdateUserDto,
-  ): Promise<UserEntity> {
+  ): Promise<IPositiveRequest> {
     return this.userRepository.update(user, updateUserDto);
   }
 
   async findByPayload({ email }): Promise<UserEntity> {
     return this.userRepository.findByPayload(email);
+  }
+
+  async changePassword(userId: string, changePassowrdDto: ChangePasswordDTO) {
+    return this.userRepository.changePassword(userId, changePassowrdDto);
   }
 }

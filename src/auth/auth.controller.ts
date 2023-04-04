@@ -27,6 +27,7 @@ import { LoginUserDTO } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { JWTAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
+import { IUpdateUser } from 'users/types/main';
 
 @ApiTags('Authorization')
 @Controller('auth')
@@ -76,7 +77,7 @@ export class AuthController {
   })
   @UseGuards(JWTAuthGuard)
   @Get('profile')
-  getProfile(@User() user: UserEntity): Promise<UserEntity> {
+  getProfile(@User() user: UserEntity): Promise<IUpdateUser> {
     return this.userRepository.findOneByEmail(user.email);
   }
 

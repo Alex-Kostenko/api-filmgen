@@ -14,10 +14,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { IPositiveRequest } from '../../core/types/main';
 
 import { JWTAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 import { User } from './decorator/user.decorator';
+import { ChangePasswordDTO } from './dto/change-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
@@ -50,11 +52,22 @@ export class UsersController {
     description: 'User not found',
   })
   @UseGuards(JWTAuthGuard)
-  @Patch()
+  @Patch('update-user')
   async update(
     @User() user: UserEntity,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<UserEntity> {
+  ): Promise<IPositiveRequest> {
     return this.usersService.update(user, updateUserDto);
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Change password' })
+  @Patch('change-password')
+  @UseGuards(JWTAuthGuard)
+  async changePassowrd(
+    @User() user: UserEntity,
+    @Body() changePassowrdDto: ChangePasswordDTO,
+  ) {
+    return await this.usersService.changePassword(user.id, changePassowrdDto);
   }
 }

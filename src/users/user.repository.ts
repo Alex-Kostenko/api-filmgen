@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -9,11 +11,11 @@ import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 
 import { RegisterUserDto } from '../auth/dto/register-user.dto';
-
 import { IPositiveRequest } from '../../core/types/main';
-
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
+import { ChangePasswordDTO } from './dto/change-password.dto';
+import { IUpdateUser } from './types/main';
 
 @Injectable()
 export class UserRepository {
@@ -27,11 +29,8 @@ export class UserRepository {
       where: { email: registerUserDto.email },
     });
 
-    if (user) {
-      throw new BadRequestException('Email is already exist');
-    }
-    if (user.username === registerUserDto.username) {
-      throw new BadRequestException('Username is already exist');
+    if (user || user.username === registerUserDto.username) {
+      throw new BadRequestException('Email or username is already exist');
     }
 
     const newUser = new UserEntity();
@@ -52,7 +51,7 @@ export class UserRepository {
   }
 
   async findOnlyPassword(userEmail: string): Promise<UserEntity> {
-    const user = this.userEntity.findOne({
+    const user = await this.userEntity.findOne({
       where: { email: userEmail },
       select: {
         password: true,
@@ -61,18 +60,17 @@ export class UserRepository {
       },
     });
 
-    if (!(await user)) {
+    if (!user) {
       throw new BadRequestException('Invalid email or password');
     }
     return user;
   }
 
-  async findOneByEmail(userEmail: string): Promise<UserEntity> {
+  async findOneByEmail(userEmail: string): Promise<IUpdateUser> {
     const user = await this.userEntity.findOne({
       where: { email: userEmail },
       select: {
         username: true,
-        id: true,
         email: true,
       },
     });
@@ -86,30 +84,21 @@ export class UserRepository {
   async update(
     user: UserEntity,
     updateUserDto: UpdateUserDto,
-  ): Promise<UserEntity> {
-    const searchUser = await this.findOneById(user.id);
+  ): Promise<IPositiveRequest> {
+    const serchUser = await this.findOneById(user.id);
 
-    if (!searchUser) {
-      throw new NotFoundException('User not found');
+    if (
+      updateUserDto.email === serchUser.email ||
+      updateUserDto.username === serchUser.username
+    ) {
+      throw new BadRequestException('Email or username is already exist!');
     }
 
-    if (updateUserDto.email) {
-      const equalEmail = await this.findOneByEmail(user.email);
+    Object.assign(serchUser, updateUserDto);
 
-      if (!equalEmail) {
-        throw new BadRequestException('Email is already used');
-      }
-    }
+    await this.userEntity.save(user);
 
-    if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
-    }
-
-    Object.assign(searchUser, updateUserDto);
-
-    const newUser = await this.userEntity.save(searchUser);
-
-    return newUser;
+    return { success: true };
   }
 
   async findByPayload(email: string): Promise<UserEntity> {
@@ -135,5 +124,41 @@ export class UserRepository {
       .execute();
 
     return { success: true };
+  }
+
+  async changePassword(
+    userId: string,
+    changePassowrdDto: ChangePasswordDTO,
+  ): Promise<IPositiveRequest> {
+    const user = await this.findOneById(userId);
+
+    if (!user) {
+      throw new HttpException(
+        'Invalid email or password',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isPassEquals = await bcrypt.compare(
+      changePassowrdDto.currentPassword,
+      user.password,
+    );
+    console.log(isPassEquals);
+
+    if (!isPassEquals) {
+      throw new BadRequestException('Current password is incorrect!');
+    }
+
+    if (changePassowrdDto.currentPassword === changePassowrdDto.newPassword) {
+      throw new BadRequestException('Current password is equal new password!');
+    }
+
+    user.password = await bcrypt.hash(changePassowrdDto.newPassword, 10);
+
+    await this.userEntity.save(user);
+
+    return {
+      success: true,
+    };
   }
 }
