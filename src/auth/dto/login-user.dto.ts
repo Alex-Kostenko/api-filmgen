@@ -10,6 +10,5 @@ export class LoginUserDTO {
 
   @ApiProperty({ type: String, required: true })
   @IsNotEmpty()
-  @MinLength(5)
   password: string;
 }

@@ -24,7 +24,6 @@ export class RegisterUserDto {
   @ApiProperty({ type: String, required: true })
   @IsString()
   @IsNotEmpty()
-  @MinLength(5)
   @MaxLength(4000)
   password: string;
 
