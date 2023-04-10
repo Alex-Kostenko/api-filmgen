@@ -25,11 +25,14 @@ export class UserRepository {
   ) {}
 
   async create(registerUserDto: RegisterUserDto): Promise<IPositiveRequest> {
-    const user = await this.userEntity.findOne({
-      where: { email: registerUserDto.email },
-    });
+    const { email, username } = registerUserDto;
+    const user = await this.userEntity
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email: email })
+      .orWhere('user.username = :username', { username: username })
+      .getOne();
 
-    if (user || user.username === registerUserDto.username) {
+    if (user) {
       throw new BadRequestException('Email or username is already exist');
     }
 
